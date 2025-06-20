@@ -1,4 +1,4 @@
-name: Run Behave Tests
+name: Run Behave Tests with Allure and Playwright
 
 on:
   push:
@@ -23,6 +23,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Install Playwright browsers
+        run: |
+          python -m playwright install --with-deps
 
       - name: Run Behave tests
         run: behave
