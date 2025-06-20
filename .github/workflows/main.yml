@@ -1,4 +1,4 @@
-name: Run Behave Tests with Allure and Playwright
+name: Run Behave Tests with Allure and Email Report
 
 on:
   push:
@@ -45,8 +45,25 @@ jobs:
         run: |
           allure generate allure-results -o allure-report --clean
 
-      - name: Upload Allure Report as Artifact
-        uses: actions/upload-artifact@v4
+      - name: Zip Allure Report
+        run: |
+          zip -r allure-report.zip allure-report
+
+      - name: Send Allure Report via Email
+        uses: dawidd6/action-send-mail@v3
         with:
-          name: allure-report
-          path: allure-report
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: "✅ Allure Report - GitHub Actions"
+          body: |
+            Hello,
+
+            The latest Allure test report is attached.
+
+            Regards,
+            GitHub CI
+          to: testns0222@gmail.com
+          from: GitHub CI <${{ secrets.EMAIL_USER }}>
+          attachments: allure-report.zip
