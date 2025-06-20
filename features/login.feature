@@ -3,7 +3,8 @@ Feature: Touchtight login feature
   Scenario: Login to touchtight with valid parameters
     Given I launch chrome browser
     When I open touchtight login page
-    And Enter username "testns0222+0290@gmail.com" and password "P@ss1234"
+    And Enter login email "testns0222+0290@gmail.com"
+    And Enter login password "P@ss1234"
     And Click the login button
     Then User must successfully login to the touchtight
 

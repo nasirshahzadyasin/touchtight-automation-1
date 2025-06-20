@@ -1,0 +1,40 @@
+# === Python artifacts ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+*.tmp
+*.bak
+
+# === Virtual environments ===
+env/
+venv/
+.venv/
+
+# === Allure Reports ===
+allure-results/
+allure-report/
+
+# === Behave reports ===
+reports/
+*.html
+*.xml
+
+# === Coverage, pytest, and other test tools ===
+.coverage
+htmlcov/
+.cache/
+.tox/
+.nox/
+.pytest_cache/
+
+# === VSCode and IDE/editor files ===
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# === OS generated files ===
+.DS_Store
+Thumbs.db
