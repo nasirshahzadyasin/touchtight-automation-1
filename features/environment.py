@@ -24,7 +24,6 @@ def before_all(context):
 
 
 def after_all(context):
-    print("Scenarios run:", len(context._runner.scenarios))
     if hasattr(context, "browser"):
         context.browser.close()
     if hasattr(context, "playwright"):
