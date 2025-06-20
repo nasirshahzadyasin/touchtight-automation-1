@@ -8,21 +8,26 @@ def before_all(context):
     userdata = context.config.userdata
     context.base_url = userdata.get('base_url', 'https://fe.stag.touchtight.com/')
     browser_type = userdata.get('browser', 'chromium')
-    headless = userdata.get('headless', 'false').lower() == 'true'
+    headless = userdata.get('headless', 'true').lower() == 'true'  # default to headless=True
 
     # Initialize Playwright
     context.playwright = sync_playwright().start()
 
-    # Browser launch
+    # Launch the browser
     context.browser = getattr(context.playwright, browser_type).launch(
         headless=headless,
         args=['--start-maximized']
     )
 
+    # Create a new page
+    context.page = context.browser.new_page()
+
 
 def after_all(context):
-    context.browser.close()
-    context.playwright.stop()
+    if hasattr(context, "browser"):
+        context.browser.close()
+    if hasattr(context, "playwright"):
+        context.playwright.stop()
 
 
 def before_scenario(context, scenario):
