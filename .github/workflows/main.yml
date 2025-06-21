@@ -26,7 +26,7 @@ jobs:
           python -m playwright install --with-deps
 
       - name: Run Behave tests
-        run: behave --format=allure_behave.formatter:AllureFormatter --outfile=allure-results
+        run: behave -f allure_behave.formatter:AllureFormatter -D allure.output_dir=allure-results
 
       - name: Install Allure CLI
         run: |
