@@ -23,9 +23,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Install Playwright browsers
-        run: |
           python -m playwright install --with-deps
 
       - name: Run Behave tests
@@ -56,7 +53,6 @@ jobs:
         run: |
           node <<EOF
           const puppeteer = require('puppeteer');
-          const fs = require('fs');
           (async () => {
             const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
             const page = await browser.newPage();
@@ -66,7 +62,14 @@ jobs:
           })();
           EOF
 
-      - name: Send Email with PDF
+      - name: Upload Allure PDF to Google Drive
+        uses: vijaykramesh/gdrive-upload-action@v1.0
+        with:
+          credentials: ${{ secrets.GDRIVE_CREDENTIALS_JSON }}
+          filename: allure-report.pdf
+          folderId: YOUR_GOOGLE_DRIVE_FOLDER_ID
+
+      - name: Send Email with PDF and GDrive Link
         if: success()
         uses: dawidd6/action-send-mail@v3
         with:
@@ -78,7 +81,10 @@ jobs:
           body: |
             Hello,
 
-            The latest Allure test report is attached in PDF format.
+            The latest Allure test report is attached as a PDF.
+
+            You can also view or download it from Google Drive:
+            https://drive.google.com/drive/folders/YOUR_GOOGLE_DRIVE_FOLDER_ID
 
             Regards,  
             GitHub CI
