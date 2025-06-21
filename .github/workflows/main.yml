@@ -1,4 +1,4 @@
-name: Run Behave Tests with Allure, Publish Report & Send Email
+name: Run Behave Tests with Allure, Upload to GDrive & Send Email
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
           python -m playwright install --with-deps
 
       - name: Run Behave tests
-        run: behave
+        run: behave --format=allure_behave.formatter:AllureFormatter --outfile=allure-results
 
       - name: Install Allure CLI
         run: |
@@ -39,33 +39,49 @@ jobs:
           tar -zxvf allure-2.27.0.tgz
           sudo mv allure-2.27.0 /opt/allure
           sudo ln -s /opt/allure/bin/allure /usr/bin/allure
-          allure --version
 
       - name: Generate Allure Report
         run: |
           allure generate allure-results -o allure-report --clean
 
-      - name: Deploy Allure Report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Set up Node.js for Puppeteer
+        uses: actions/setup-node@v3
         with:
-          github_token: ${{ secrets.TOUCHTIGHT_TOKEN_GITHUB }}
-          publish_dir: ./allure-report
+          node-version: '20'
 
-      - name: Send Email with Report Link
+      - name: Install Puppeteer
+        run: npm install puppeteer
+
+      - name: Convert Allure Report to PDF
+        run: |
+          node <<EOF
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+          (async () => {
+            const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
+            const page = await browser.newPage();
+            await page.goto('file://' + process.cwd() + '/allure-report/index.html', {waitUntil: 'networkidle0'});
+            await page.pdf({ path: 'allure-report.pdf', format: 'A4', printBackground: true });
+            await browser.close();
+          })();
+          EOF
+
+      - name: Send Email with PDF
+        if: success()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 465
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASS }}
-          subject: "✅ Allure Report - GitHub Actions"
+          subject: "✅ Allure Report (PDF) - GitHub Actions"
           body: |
             Hello,
 
-            The latest Allure test report is available at:
-            https://nasirshahzadyasin.github.io/touchtight-automation-1/
+            The latest Allure test report is attached in PDF format.
 
             Regards,  
             GitHub CI
           to: testns0222@gmail.com
           from: GitHub CI <${{ secrets.EMAIL_USER }}>
+          attachments: allure-report.pdf
