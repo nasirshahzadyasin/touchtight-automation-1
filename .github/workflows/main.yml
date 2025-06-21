@@ -1,4 +1,4 @@
-name: Run Behave Tests with Allure, Upload to GDrive & Send Email
+name: Run Behave Tests, Export Allure Report to PDF & Email
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  behave-tests:
+  allure-report:
     runs-on: ubuntu-latest
 
     steps:
@@ -53,6 +53,7 @@ jobs:
         run: |
           node <<EOF
           const puppeteer = require('puppeteer');
+          const fs = require('fs');
           (async () => {
             const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
             const page = await browser.newPage();
@@ -62,14 +63,7 @@ jobs:
           })();
           EOF
 
-      - name: Upload Allure PDF to Google Drive
-        uses: vijaykramesh/gdrive-upload-action@v1.0
-        with:
-          credentials: ${{ secrets.GDRIVE_CREDENTIALS_JSON }}
-          filename: allure-report.pdf
-          folderId: YOUR_GOOGLE_DRIVE_FOLDER_ID
-
-      - name: Send Email with PDF and GDrive Link
+      - name: Send Email with PDF
         if: success()
         uses: dawidd6/action-send-mail@v3
         with:
@@ -81,10 +75,7 @@ jobs:
           body: |
             Hello,
 
-            The latest Allure test report is attached as a PDF.
-
-            You can also view or download it from Google Drive:
-            https://drive.google.com/drive/folders/YOUR_GOOGLE_DRIVE_FOLDER_ID
+            The latest Allure test report is attached in PDF format.
 
             Regards,  
             GitHub CI
