@@ -1,4 +1,4 @@
-name: Run Behave Tests with Allure and Email Report
+name: Run Behave Tests with Allure, Publish Report & Send Email
 
 on:
   push:
@@ -45,11 +45,13 @@ jobs:
         run: |
           allure generate allure-results -o allure-report --clean
 
-      - name: Zip Allure Report
-        run: |
-          zip -r allure-report.zip allure-report
+      - name: Deploy Allure Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
 
-      - name: Send Allure Report via Email
+      - name: Send Email with Report Link
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -60,10 +62,10 @@ jobs:
           body: |
             Hello,
 
-            The latest Allure test report is attached.
+            The latest Allure test report is available at:
+            https://nasirshahzadyasin.github.io/touchtight-automation-1/
 
-            Regards,
+            Regards,  
             GitHub CI
           to: testns0222@gmail.com
           from: GitHub CI <${{ secrets.EMAIL_USER }}>
-          attachments: allure-report.zip
