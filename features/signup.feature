@@ -6,7 +6,7 @@ Feature: Touchtight Signup feature
     And Click get started button
     And Enter fullname "testns"
     And Enter password "P@ss1234"
-    And Enter application secret key "TuhcN250YQ#pO%$h&9&@Z4MGVROPCQ#P0B&#2AZ"
+    And Enter application secret key
     And Enter club name "new club"
     And Click Create Account button
     Then Verify that user account created successfully

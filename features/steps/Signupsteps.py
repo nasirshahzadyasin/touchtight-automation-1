@@ -1,3 +1,4 @@
+import os
 import time
 from behave import *
 from pages.self_healing import self_healing_locator
@@ -39,8 +40,10 @@ def pwd_input(context, pwd):
     element.fill(pwd)
 
 
-@when('Enter application secret key "{key}"')
-def key_input(context, key):
+@when('Enter application secret key')
+def key_input(context):
+    key = os.getenv("APP_SECRET_KEY")
+    assert key, "APP_SECRET_KEY is not set in environment variables"
     element = self_healing_locator(context.page, appsecret_input_selectors, context_name="App Secret Input")
     element.fill(key)
 
