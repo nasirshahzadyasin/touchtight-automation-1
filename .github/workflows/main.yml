@@ -53,11 +53,14 @@ jobs:
         run: |
           node <<EOF
           const puppeteer = require('puppeteer');
-          const fs = require('fs');
           (async () => {
             const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
             const page = await browser.newPage();
-            await page.goto('file://' + process.cwd() + '/allure-report/index.html', {waitUntil: 'networkidle0'});
+            await page.goto('file://' + process.cwd() + '/allure-report/index.html', { waitUntil: 'networkidle0' });
+
+            // ✅ Wait until Allure content is rendered
+            await page.waitForSelector('div.report-content', { timeout: 10000 });
+
             await page.pdf({ path: 'allure-report.pdf', format: 'A4', printBackground: true });
             await browser.close();
           })();
