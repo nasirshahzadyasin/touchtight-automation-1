@@ -1,4 +1,3 @@
-import time
 from behave import *
 from pages.self_healing import self_healing_locator
 from pages.locators import *
@@ -36,4 +35,27 @@ def click_login(context):
 @then('User must successfully login to the touchtight')
 def Verify(context):
     element = self_healing_locator(context.page, verify_login_success, context_name="My Library")
+    element.click()
+
+
+@given('I am on home page')
+def home(context):
+    pass
+
+
+@when('click the profile icon')
+def profile_icon(context):
+    element = self_healing_locator(context.page, profile_icon_xpath, context_name="Profile icon")
+    element.click()
+
+
+@when('Click logout button')
+def logout_button(context):
+    element = self_healing_locator(context.page, logout_btn_xpath, context_name="Log out")
+    element.click()
+
+
+@then('Verify that logged out successfully')
+def verify_after(context):
+    element = self_healing_locator(context.page, home_text_path, context_name="Homepage_logged out")
     element.click()

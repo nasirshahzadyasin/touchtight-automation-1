@@ -17,9 +17,9 @@ allure-results/
 allure-report/
 
 # === Behave reports ===
-#reports/
-#*.html
-#*.xml
+reports/
+*.html
+*.xml
 
 # === Coverage, pytest, and other test tools ===
 .coverage
