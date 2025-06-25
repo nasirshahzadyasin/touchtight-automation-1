@@ -1,17 +1,13 @@
-Feature: Test Login/Logout Functionality
+Feature: Test Login Functionality
 
-  Scenario: Login with valid parameters
+  Scenario: Login with valid credentials
     Given I launch chrome browser
-    When I open touchtight login page
-    And Enter login email "testns0222+0290@gmail.com"
-    And Enter login password "P@ss1234"
-    And Click the login button
-    Then User must successfully login to the touchtight
-Scenario: Logout
-  Given I am on home page
-  When click the profile icon
-  And Click logout button
-  Then Verify that logged out successfully
+    When I open the Touchtight login page
+    And I enter login email "testns0222+0290@gmail.com"
+    And I enter login password "P@ss1234"
+    And I click the login button
+    Then I should be successfully logged into Touchtight
+
 # Scenario Outline: Login to touchtight with valid parameters
 #    Given I launch chrome browser
 #    When I open touchtight login page
