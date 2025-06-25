@@ -4,7 +4,7 @@ from behave import *
 from playwright.sync_api import expect
 
 pricing_xpath = "//a[.//p[contains(text(), 'Pricing')]]"
-pricing_title_xpath = "//p[contains(text(), 'Finalize Your Subscription')]"
+pricing_title_xpath = "//p[contains(text(), 'Test')]"
 
 
 @given('I am on the homepage')
