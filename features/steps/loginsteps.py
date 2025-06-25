@@ -1,61 +1,39 @@
-from behave import *
+from behave import given, when, then
 from pages.self_healing import self_healing_locator
-from pages.locators import *
+from pages.locators import *  # Ensure all locators used below are defined
 
 
 @given('I launch chrome browser')
-def browser(context):
+def step_launch_browser(context):
+    # Browser setup typically handled in environment.py
     pass
 
 
-@when('I open touchtight login page')
-def goto_login(context):
-    element = self_healing_locator(context.page, login_link_xpath, context_name="Login")
+@when('I open the Touchtight login page')
+def step_open_login_page(context):
+    element = self_healing_locator(context.page, login_link_xpath, context_name="Login Link")
     element.click()
 
 
-@when('Enter login email "{login_email}"')
-def enter_email(context, login_email):
-    element = self_healing_locator(context.page, login_email_input_selectors, context_name="Email Input")
-    element.fill(login_email)
+@when('I enter login email "{email}"')
+def step_enter_login_email(context, email):
+    element = self_healing_locator(context.page, login_email_input_selectors, context_name="Login Email Input")
+    element.fill(email)
 
 
-@when('Enter login password "{login_pwd}"')
-def pwd_input(context, login_pwd):
-    element = self_healing_locator(context.page, password_input_selectors, context_name="Password Input")
-    element.fill(login_pwd)
+@when('I enter login password "{password}"')
+def step_enter_login_password(context, password):
+    element = self_healing_locator(context.page, password_input_selectors, context_name="Login Password Input")
+    element.fill(password)
 
 
-@when('Click the login button')
-def click_login(context):
-    element = self_healing_locator(context.page, button_log_in, context_name="Log In")
+@when('I click the login button')
+def step_click_login_button(context):
+    element = self_healing_locator(context.page, button_log_in, context_name="Login Button")
     element.click()
 
 
-@then('User must successfully login to the touchtight')
-def Verify(context):
-    element = self_healing_locator(context.page, verify_login_success, context_name="My Library")
-    element.click()
-
-
-@given('I am on home page')
-def home(context):
-    pass
-
-
-@when('click the profile icon')
-def profile_icon(context):
-    element = self_healing_locator(context.page, profile_icon_xpath, context_name="Profile icon")
-    element.click()
-
-
-@when('Click logout button')
-def logout_button(context):
-    element = self_healing_locator(context.page, logout_btn_xpath, context_name="Log out")
-    element.click()
-
-
-@then('Verify that logged out successfully')
-def verify_after(context):
-    element = self_healing_locator(context.page, home_text_path, context_name="Homepage_logged out")
-    element.click()
+@then('I should be successfully logged into Touchtight')
+def step_verify_successful_login(context):
+    element = self_healing_locator(context.page, verify_login_success, context_name="Login Success Confirmation")
+    assert element.is_visible(), "Login failed: Success element not visible"

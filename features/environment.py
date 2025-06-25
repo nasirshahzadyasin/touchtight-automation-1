@@ -2,6 +2,8 @@ from playwright.sync_api import sync_playwright
 import subprocess
 import os
 
+from pages.login_helper import login_user
+
 
 def before_all(context):
     # Get command-line parameters
@@ -22,6 +24,9 @@ def before_all(context):
     # Create a new page
     context.page = context.browser.new_page()
 
+    # ✅ Initialize flag here
+    context.is_logged_in = False
+
 
 def after_all(context):
     if hasattr(context, "browser"):
@@ -31,10 +36,13 @@ def after_all(context):
 
 
 def before_scenario(context, scenario):
-    context.page = context.browser.new_page()
-    # context.page.set_viewport_size({"width": 1920, "height": 1180})
-    # Navigate to base URL at scenario start
-    context.page.goto(context.base_url)
+    if 'login_required' in scenario.tags:
+        if not hasattr(context, "is_logged_in") or not context.is_logged_in:
+            email = context.config.userdata.get("email", "testns0222+0290@gmail.com")
+            password = context.config.userdata.get("password", "P@ss1234")
+            assert email and password, "Missing email or password from CLI or config"
+            login_user(context, email, password)
+            context.is_logged_in = True
 
 
 def after_scenario(context, scenario):
