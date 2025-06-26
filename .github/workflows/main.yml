@@ -32,27 +32,27 @@ jobs:
       - name: Run Behave tests and generate HTML report
         run: behave -f behave_html_formatter:HTMLFormatter -o reports/reports.html
 
-      # - name: Set up Node.js for Puppeteer
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: '20'
+      - name: Set up Node.js for Puppeteer
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
 
-      # - name: Install Puppeteer
-      #   run: npm install puppeteer
+      - name: Install Puppeteer
+        run: npm install puppeteer
 
-      # - name: Convert HTML report to PDF
-      #   run: |
-      #     node <<EOF
-      #     const puppeteer = require('puppeteer');
-      #     const fs = require('fs');
-      #     (async () => {
-      #       const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
-      #       const page = await browser.newPage();
-      #       await page.goto('file://' + process.cwd() + '/reports/reports.html', { waitUntil: 'networkidle0' });
-      #       await page.pdf({ path: 'reports/report.pdf', format: 'A4', printBackground: true });
-      #       await browser.close();
-      #     })();
-      #     EOF
+      - name: Convert HTML report to PDF
+        run: |
+          node <<EOF
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+          (async () => {
+            const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
+            const page = await browser.newPage();
+            await page.goto('file://' + process.cwd() + '/reports/reports.html', { waitUntil: 'networkidle0' });
+            await page.pdf({ path: 'reports/report.pdf', format: 'A4', printBackground: true });
+            await browser.close();
+          })();
+          EOF
 
       - name: Send PDF Report via Email
         if: success()
