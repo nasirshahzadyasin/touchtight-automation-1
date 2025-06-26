@@ -1,14 +1,16 @@
-name: Run Behave Tests and Send PDF Report via Email
+name: Run Behave Tests with Allure and Send PDF Report via Email
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 env:
   APP_SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
+
 jobs:
-  behave-report:
+  allure-report:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,11 +28,20 @@ jobs:
           pip install -r requirements.txt
           python -m playwright install --with-deps
 
-      - name: Create reports directory
-        run: mkdir -p reports
+      - name: Run Behave tests with Allure formatter
+        run: behave -f allure_behave.formatter:AllureFormatter -o allure-results
 
-      - name: Run Behave tests and generate HTML report
-        run: behave -f behave_html_formatter:HTMLFormatter -o reports/reports.html
+      - name: Install Allure CLI
+        run: |
+          sudo apt update
+          sudo apt install -y default-jre
+          wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
+          tar -zxvf allure-2.27.0.tgz
+          sudo mv allure-2.27.0 /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+
+      - name: Generate Allure HTML Report
+        run: allure generate allure-results -o allure-report --clean
 
       - name: Set up Node.js for Puppeteer
         uses: actions/setup-node@v3
@@ -40,19 +51,24 @@ jobs:
       - name: Install Puppeteer
         run: npm install puppeteer
 
-      - name: Convert HTML report to PDF
+      - name: Convert Allure HTML report to PDF
         run: |
           node <<EOF
           const puppeteer = require('puppeteer');
-          const fs = require('fs');
           (async () => {
             const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
             const page = await browser.newPage();
-            await page.goto('file://' + process.cwd() + '/reports/reports.html', { waitUntil: 'networkidle0' });
-            await page.pdf({ path: 'reports/report.pdf', format: 'A4', printBackground: true });
+            await page.goto('file://' + process.cwd() + '/allure-report/index.html', { waitUntil: 'networkidle0' });
+            await page.pdf({ path: 'allure-report.pdf', format: 'A4', printBackground: true });
             await browser.close();
           })();
           EOF
+
+      - name: Upload PDF as artifact (optional)
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-pdf-report
+          path: allure-report.pdf
 
       - name: Send PDF Report via Email
         if: success()
@@ -62,14 +78,14 @@ jobs:
           server_port: 465
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASS }}
-          subject: "✅ TouchTight Automation Test Report (PDF)"
+          subject: "✅ TouchTight Allure Test Report (PDF)"
           body: |
             Hello,
 
-            The latest test report is attached in PDF format.
+            The attached PDF is the latest automation test report generated using Allure and Behave.
 
             Regards,  
             QA Automation
           to: testns0222@gmail.com
           from: QA <${{ secrets.EMAIL_USER }}>
-          attachments: reports/report.pdf
+          attachments: allure-report.pdf
