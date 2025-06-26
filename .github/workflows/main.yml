@@ -72,4 +72,4 @@ jobs:
             QA Automation
           to: testns0222@gmail.com
           from: QA <${{ secrets.EMAIL_USER }}>
-          attachments: /reports/report.pdf
+          attachments: reports/report.pdf
