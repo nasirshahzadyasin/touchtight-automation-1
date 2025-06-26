@@ -26,7 +26,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install --upgrade allure-behave allure-python-commons
           python -m playwright install --with-deps
+          
 
       - name: Run Behave tests with Allure formatter
         run: behave -f allure_behave.formatter:AllureFormatter -o allure-results
