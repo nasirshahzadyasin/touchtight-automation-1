@@ -1,20 +1,18 @@
-name: Run Behave Tests with Allure and Generate Report
+name: Run Behave Tests and Send PDF Report via Email
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
 env:
   APP_SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
-
 jobs:
-  allure-report:
+  behave-report:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -22,39 +20,56 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Python Dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install allure-behave>=2.13.2 allure-python-commons>=2.13.2
           python -m playwright install --with-deps
-          
-      - name: Run Behave Tests with Allure Formatter
-        run: behave -f allure_behave.formatter:AllureFormatter -o allure-results
 
-      - name: Install Allure CLI
-        run: |
-          sudo apt update
-          sudo apt install -y default-jre
-          wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
-          tar -zxvf allure-2.27.0.tgz
-          sudo mv allure-2.27.0 /opt/allure
-          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+      - name: Create reports directory
+        run: mkdir -p reports
 
-      - name: Generate Allure HTML Report
-        run: allure generate allure-results -o allure-report --clean
+      - name: Run Behave tests and generate HTML report
+        run: behave -f behave_html_formatter:HTMLFormatter -o reports/reports.html
 
-      - name: Upload Allure Report as Artifact
-        uses: actions/upload-artifact@v4
+      - name: Set up Node.js for Puppeteer
+        uses: actions/setup-node@v3
         with:
-          name: allure-html-report
-          path: allure-report
+          node-version: '20'
 
-      # ✅ OPTIONAL: Publish Allure Report to GitHub Pages
-      # Uncomment below if you want to host it live:
-      #
-      # - name: Deploy Allure Report to GitHub Pages
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: ./allure-report
+      - name: Install Puppeteer
+        run: npm install puppeteer
+
+      - name: Convert HTML report to PDF
+        run: |
+          node <<EOF
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+          (async () => {
+            const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
+            const page = await browser.newPage();
+            await page.goto('file://' + process.cwd() + '/reports/reports.html', { waitUntil: 'networkidle0' });
+            await page.pdf({ path: 'reports/report.pdf', format: 'A4', printBackground: true });
+            await browser.close();
+          })();
+          EOF
+
+      - name: Send PDF Report via Email
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: "✅ TouchTight Automation Test Report (PDF)"
+          body: |
+            Hello,
+
+            The latest test report is attached in PDF format.
+
+            Regards,  
+            QA Automation
+          to: testns0222@gmail.com
+          from: QA <${{ secrets.EMAIL_USER }}>
+          attachments: reports/report.pdf
