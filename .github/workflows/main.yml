@@ -31,7 +31,7 @@ jobs:
           
 
       - name: Run Behave tests with Allure formatter
-        run: behave -f allure_behave.formatter:AllureFormatter -o allure-results
+        run: behave -f allure_behave.formatter:AllureFormatter -o allure-results --no-capture
 
       - name: Install Allure CLI
         run: |
