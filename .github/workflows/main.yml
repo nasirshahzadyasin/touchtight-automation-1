@@ -65,7 +65,7 @@ jobs:
           EOF
 
       - name: Upload PDF as artifact (optional)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: allure-pdf-report
           path: allure-report.pdf
