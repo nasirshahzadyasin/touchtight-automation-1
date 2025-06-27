@@ -1,4 +1,4 @@
-name: Run Behave Tests and Send PDF Report via Email
+name: Run Behave Tests and Send CTRF CSV Report via Email
 
 on:
   push:
@@ -27,48 +27,24 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install behave allure-behave
-          python -m playwright install --with-deps
 
       - name: Create reports directory
         run: mkdir -p reports
 
-      - name: Run Behave tests (HTML + JSON)
+      - name: Run Behave tests with HTML and JSON output
         run: |
           behave -f behave_html_formatter:HTMLFormatter -o reports/reports.html \
                  -f json -o behave_raw.json
 
-      - name: Convert Behave JSON to CTRf JSON
+      - name: Convert Behave JSON to CTRF JSON
         run: |
           python pages/convert_to_ctrf.py
 
-      - name: Upload CTRf Report as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ctrf-report
-          path: ctrf_result.json
-
-      - name: Set up Node.js for Puppeteer
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install Puppeteer
-        run: npm install puppeteer
-
-      - name: Convert HTML report to PDF
+      - name: Convert CTRF JSON to CSV
         run: |
-          node <<EOF
-          const puppeteer = require('puppeteer');
-          (async () => {
-            const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
-            const page = await browser.newPage();
-            await page.goto('file://' + process.cwd() + '/reports/reports.html', { waitUntil: 'networkidle0' });
-            await page.pdf({ path: 'reports/report.pdf', format: 'A4', printBackground: true });
-            await browser.close();
-          })();
-          EOF
+          python pages/convert_ctrf_to_csv.py
 
-      - name: Send Reports via Email
+      - name: Email CTRF Report (CSV Format)
         if: success()
         uses: dawidd6/action-send-mail@v3
         with:
@@ -76,18 +52,14 @@ jobs:
           server_port: 465
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASS }}
-          subject: "✅ TouchTight Automation Test Reports (PDF + CTRF)"
+          subject: "✅ TouchTight CTRF Test Report (CSV)"
           body: |
             Hello,
 
-            The latest test reports are attached:
-            - 📄 PDF (human-readable)
-            - 📊 CTRF JSON (structured format for automated systems)
+            The latest test results are attached as a CSV file (Excel-compatible).
 
             Regards,  
             QA Automation Team
           to: testns0222@gmail.com
           from: QA <${{ secrets.EMAIL_USER }}>
-          attachments: |
-            reports/report.pdf
-            ctrf_result.json
+          attachments: ctrf_result.csv
