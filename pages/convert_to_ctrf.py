@@ -1,4 +1,4 @@
-import json, os
+import json
 
 with open("behave_raw.json") as f:
     behave_data = json.load(f)
@@ -28,5 +28,3 @@ for feature in behave_data:
 
 with open("ctrf_result.json", "w") as out:
     json.dump(ctrf_result, out, indent=2)
-
-print("CTRf result generated: ctrf_result.json")
