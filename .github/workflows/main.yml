@@ -54,7 +54,7 @@ jobs:
           })();
           EOF
 
-      - name: Send PDF Report via Email
+      - name: Send Reports via Email
         if: success()
         uses: dawidd6/action-send-mail@v3
         with:
@@ -62,14 +62,18 @@ jobs:
           server_port: 465
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASS }}
-          subject: "✅ TouchTight Automation Test Report (PDF)"
+          subject: "✅ TouchTight Automation Test Reports (PDF + CTRF)"
           body: |
             Hello,
 
-            The latest test report is attached in PDF format.
+            The latest test reports are attached:
+            - 📄 PDF (human-readable)
+            - 📊 CTRF JSON (structured format for automated systems)
 
             Regards,  
-            QA Automation
+            QA Automation Team
           to: testns0222@gmail.com
           from: QA <${{ secrets.EMAIL_USER }}>
-          attachments: reports/report.pdf
+          attachments: |
+            reports/report.pdf
+            ctrf_result.json
