@@ -4,7 +4,7 @@ import csv
 with open("Touchtight_Automation_Test_Report.json", "r") as f:
     data = json.load(f)
 
-with open("ctrf_result.csv", "w", newline='') as csvfile:
+with open("Touchtight_Automation_Test_Report.csv", "w", newline='') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(["Feature", "Test Case", "Status", "Step Count", "Tags"])
 
