@@ -1,7 +1,7 @@
 import json
 import csv
 
-with open("ctrf_result.json", "r") as f:
+with open("Touchtight_Automation_Test_Report.json", "r") as f:
     data = json.load(f)
 
 with open("ctrf_result.csv", "w", newline='') as csvfile:
