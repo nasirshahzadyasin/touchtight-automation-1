@@ -63,4 +63,4 @@ jobs:
             QA Automation Team
           to: testns0222@gmail.com
           from: QA <${{ secrets.EMAIL_USER }}>
-          attachments: ctrf_result.csv
+          attachments: Touchtight_Automation_Report.csv
