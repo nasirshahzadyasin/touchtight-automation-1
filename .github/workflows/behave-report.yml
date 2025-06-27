@@ -27,6 +27,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install behave allure-behave
+          python -m playwright install --with-deps
 
       - name: Create reports directory
         run: mkdir -p reports
