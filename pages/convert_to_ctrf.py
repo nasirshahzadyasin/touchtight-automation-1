@@ -26,5 +26,5 @@ for feature in behave_data:
         }
         ctrf_result["tests"].append(test_case)
 
-with open("ctrf_result.json", "w") as out:
+with open("Touchtight_Automation_Test_Report.json", "w") as out:
     json.dump(ctrf_result, out, indent=2)
