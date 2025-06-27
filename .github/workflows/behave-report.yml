@@ -39,7 +39,7 @@ jobs:
 
       - name: Convert Behave JSON to CTRf JSON
         run: |
-          python scripts/convert_to_ctrf.py
+          python pages/convert_to_ctrf.py
 
       - name: Upload CTRf Report as Artifact
         uses: actions/upload-artifact@v4
