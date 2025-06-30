@@ -63,4 +63,4 @@ def create_acc_button(context):
 @then('Verify that user account created successfully')
 def verify_acc_creation(context):
     element = self_healing_locator(context.page, verify_login_success, context_name="My Library")
-    element.text_content()
+    element.click()
