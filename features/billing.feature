@@ -1,4 +1,4 @@
-Feature: Pricing functionality
+Feature: Test Pricing functionality
 
   Scenario: Click Pricing button on home page
     Given I am on the homepage

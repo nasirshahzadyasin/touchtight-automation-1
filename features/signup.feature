@@ -1,4 +1,4 @@
-Feature: Touchtight Signup feature
+Feature: Test Signup Functionality
   Scenario: Signup to touchtight with valid parameters
     Given I open touchtight app
     When I open touchtight Signup page
